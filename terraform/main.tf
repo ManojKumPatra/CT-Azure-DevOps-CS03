@@ -1,8 +1,10 @@
+# Resource Group
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.location
 }
 
+# Virtual Network
 resource "azurerm_virtual_network" "vnet" {
   name                = "vnet-prod"
   location            = var.location
@@ -10,6 +12,37 @@ resource "azurerm_virtual_network" "vnet" {
   address_space       = ["10.0.0.0/16"]
 }
 
+# Subnet
+resource "azurerm_subnet" "subnet" {
+  name                 = "subnet-prod"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.vnet.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+# Public IP
+resource "azurerm_public_ip" "pip" {
+  name                = "pip-prod"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Dynamic"
+}
+
+# Network Interface
+resource "azurerm_network_interface" "nic" {
+  name                = "nic-prod"
+  location            = var.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  ip_configuration {
+    name                          = "internal"
+    subnet_id                     = azurerm_subnet.subnet.id
+    private_ip_address_allocation = "Dynamic"
+    public_ip_address_id          = azurerm_public_ip.pip.id
+  }
+}
+
+# Storage Account
 resource "azurerm_storage_account" "storage" {
   name                     = var.storage_account_name
   resource_group_name      = azurerm_resource_group.rg.name
@@ -18,19 +51,23 @@ resource "azurerm_storage_account" "storage" {
   account_replication_type = "GRS"
 }
 
+# SQL Server
 resource "azurerm_mssql_server" "sql" {
   name                         = var.sql_server_name
   resource_group_name          = azurerm_resource_group.rg.name
   location                     = var.location
   administrator_login          = var.sql_admin_user
   administrator_login_password = var.sql_admin_password
+  version                      = "12.0"
 }
 
+# SQL Database
 resource "azurerm_mssql_database" "sqldb" {
   name      = var.sql_db_name
   server_id = azurerm_mssql_server.sql.id
 }
 
+# Linux VM
 resource "azurerm_linux_virtual_machine" "vm" {
   name                = var.vm_name
   resource_group_name = azurerm_resource_group.rg.name
@@ -63,6 +100,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 }
 
+# Log Analytics Workspace
 resource "azurerm_log_analytics_workspace" "law" {
   name                = "law-prod"
   location            = var.location

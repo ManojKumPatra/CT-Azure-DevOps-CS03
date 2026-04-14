@@ -16,9 +16,6 @@ steps:
     scriptLocation: inlineScript
     workingDirectory: terraform
     inlineScript: |
-      echo "Terraform version"
-      terraform version
-      
       echo "Terraform Init"
       terraform init
 
@@ -30,3 +27,4 @@ steps:
 
   env:
     TF_VAR_sql_admin_password: $(sql_admin_password)
+    TF_VAR_ssh_public_key: $(ssh_public_key)
