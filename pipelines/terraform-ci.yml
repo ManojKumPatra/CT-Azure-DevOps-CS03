@@ -17,6 +17,13 @@ steps:
     workingDirectory: $(System.DefaultWorkingDirectory)/terraform
     inlineScript: |
       terraform version
+      echo "Current directory"
+      dir
+
+      echo "Terraform folder check"
+      dir $(System.DefaultWorkingDirectory)/terraform
+
+      cd $(System.DefaultWorkingDirectory)/terraform
 
       echo "Terraform Init"
       terraform init -reconfigure
@@ -25,7 +32,7 @@ steps:
       terraform validate
 
       echo "Terraform Plan"
-      terraform plan -var-file="prod.tfvars" -out=tfplan -input=false
+      terraform plan -var-file="env/prod.tfvars" -out=tfplan -input=false
 
       terraform show -no-color tfplan > tfplan.txt
 
