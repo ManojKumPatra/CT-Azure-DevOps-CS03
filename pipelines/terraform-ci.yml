@@ -5,17 +5,19 @@ pool:
   name: default
 
 variables:
-- group: terraform-secrets   # Variable group where sql_admin_password is stored
+- group: terraform-secrets
 
 steps:
 - task: AzureCLI@2
-  displayName: Terraform Init, Validate, Plan
+  displayName: Terraform Init Validate Plan
   inputs:
-    azureSubscription: terraform-connection   # REQUIRED service connection
+    azureSubscription: terraform-connection
     scriptType: ps
     scriptLocation: inlineScript
-    workingDirectory: terraform
+    workingDirectory: $(System.DefaultWorkingDirectory)/terraform
     inlineScript: |
+      terraform version
+
       echo "Terraform Init"
       terraform init
 
@@ -23,7 +25,9 @@ steps:
       terraform validate
 
       echo "Terraform Plan"
-      terraform plan -var-file=env/prod.tfvars
+      terraform plan -out=tfplan
+
+      terraform show -no-color tfplan > tfplan.txt
 
   env:
     TF_VAR_sql_admin_password: $(sql_admin_password)
