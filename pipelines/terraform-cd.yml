@@ -1,16 +1,32 @@
 trigger: none
 
+pool:
+  name: default
+
+variables:
+- group: terraform-secrets
+
 stages:
-- stage: Deploy
+- stage: Apply
+  displayName: Terraform Apply (Prod)
   jobs:
   - deployment: TerraformApply
-    environment: prod
+    environment: prod   # This enforces approval
     strategy:
       runOnce:
         deploy:
           steps:
-          - script: terraform init
-            workingDirectory: terraform
-
-          - script: terraform apply -auto-approve -var-file=env/prod.tfvars
-            workingDirectory: terraform
+          - task: AzureCLI@2
+            displayName: Terraform Apply
+            inputs:
+              azureSubscription: terraform-connection
+              scriptType: ps
+              scriptLocation: inlineScript
+              workingDirectory: $(System.DefaultWorkingDirectory)/terraform
+              inlineScript: |
+                terraform version
+                terraform init -reconfigure
+                terraform apply -var-file="env/prod.tfvars" -auto-approve
+            env:
+              TF_VAR_sql_admin_password: $(sql_admin_password)
+              TF_VAR_ssh_public_key: $(ssh_public_key
