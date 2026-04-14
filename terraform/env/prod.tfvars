@@ -3,6 +3,7 @@ location             = "East US"
 
 vm_name              = "vm-prod-app"
 admin_username       = "azureuser"
+ssh_public_key       = "SHA256:ffV57p4tgjRRjWTz2C4y+C2Ja6s7Pv81hFDcHYAID4M"
 
 storage_account_name = "stgprod001"
 

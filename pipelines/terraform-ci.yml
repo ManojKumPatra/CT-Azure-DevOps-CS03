@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  name: default
 
 variables:
 - group: terraform-secrets   # Variable group where sql_admin_password is stored
