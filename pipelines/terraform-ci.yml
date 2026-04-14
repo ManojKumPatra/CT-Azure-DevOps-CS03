@@ -16,6 +16,9 @@ steps:
     scriptLocation: inlineScript
     workingDirectory: terraform
     inlineScript: |
+      echo "Terraform version"
+      terraform version
+      
       echo "Terraform Init"
       terraform init
 
