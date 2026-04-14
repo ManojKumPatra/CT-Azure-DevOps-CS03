@@ -1,0 +1,18 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+env:
+  TF_VAR_sql_admin_password: $(sql_admin_password)
+
+steps:
+- script: terraform init
+  workingDirectory: terraform
+
+- script: terraform validate
+  workingDirectory: terraform
+
+- script: terraform plan -var-file=env/prod.tfvars
+  workingDirectory: terraform
