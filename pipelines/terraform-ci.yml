@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  name: default
+  name: default   # make sure this is your self-hosted pool
 
 variables:
 - group: terraform-secrets
@@ -17,13 +17,6 @@ steps:
     workingDirectory: $(System.DefaultWorkingDirectory)/terraform
     inlineScript: |
       terraform version
-      echo "Current directory"
-      dir
-
-      echo "Terraform folder check"
-      dir $(System.DefaultWorkingDirectory)/terraform
-
-      cd $(System.DefaultWorkingDirectory)/terraform
 
       echo "Terraform Init"
       terraform init -reconfigure
@@ -35,12 +28,11 @@ steps:
       terraform plan -var-file="env/prod.tfvars" -out=tfplan -input=false
 
       terraform show -no-color tfplan > tfplan.txt
+  env:   # THIS is where TF_VAR must be
+    TF_VAR_sql_admin_password: $(sql_admin_password)
+    TF_VAR_ssh_public_key: $(ssh_public_key)
 
 - task: PublishBuildArtifacts@1
   inputs:
     pathToPublish: '$(System.DefaultWorkingDirectory)/terraform/tfplan.txt'
     artifactName: tfplan
-
-  env:
-    TF_VAR_sql_admin_password: $(sql_admin_password)
-    TF_VAR_ssh_public_key: $(ssh_public_key)
