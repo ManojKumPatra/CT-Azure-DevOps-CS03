@@ -4,15 +4,26 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+- group: terraform-secrets   # Variable group where sql_admin_password is stored
+
 env:
   TF_VAR_sql_admin_password: $(sql_admin_password)
 
 steps:
-- script: terraform init
-  workingDirectory: terraform
+- task: AzureCLI@2
+  displayName: Terraform Init, Validate, Plan
+  inputs:
+    azureSubscription: terraform-connection   # REQUIRED service connection
+    scriptType: bash
+    scriptLocation: inlineScript
+    workingDirectory: terraform
+    inlineScript: |
+      echo "Terraform Init"
+      terraform init
 
-- script: terraform validate
-  workingDirectory: terraform
+      echo "Terraform Validate"
+      terraform validate
 
-- script: terraform plan -var-file=env/prod.tfvars
-  workingDirectory: terraform
+      echo "Terraform Plan"
+      terraform plan -var-file=env/prod.tfvars
