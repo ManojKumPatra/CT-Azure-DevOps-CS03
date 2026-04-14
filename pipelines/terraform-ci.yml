@@ -7,9 +7,6 @@ pool:
 variables:
 - group: terraform-secrets   # Variable group where sql_admin_password is stored
 
-env:
-  TF_VAR_sql_admin_password: $(sql_admin_password)
-
 steps:
 - task: AzureCLI@2
   displayName: Terraform Init, Validate, Plan
@@ -27,3 +24,6 @@ steps:
 
       echo "Terraform Plan"
       terraform plan -var-file=env/prod.tfvars
+
+  env:
+    TF_VAR_sql_admin_password: $(sql_admin_password)
