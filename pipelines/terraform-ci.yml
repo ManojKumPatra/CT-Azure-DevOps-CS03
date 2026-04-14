@@ -12,7 +12,7 @@ steps:
   displayName: Terraform Init, Validate, Plan
   inputs:
     azureSubscription: terraform-connection   # REQUIRED service connection
-    scriptType: bash
+    scriptType: ps
     scriptLocation: inlineScript
     workingDirectory: terraform
     inlineScript: |
