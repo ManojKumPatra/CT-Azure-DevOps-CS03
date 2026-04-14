@@ -19,15 +19,20 @@ steps:
       terraform version
 
       echo "Terraform Init"
-      terraform init
+      terraform init -reconfigure
 
       echo "Terraform Validate"
       terraform validate
 
       echo "Terraform Plan"
-      terraform plan -out=tfplan
+      terraform plan -var-file="prod.tfvars" -out=tfplan -input=false
 
       terraform show -no-color tfplan > tfplan.txt
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(System.DefaultWorkingDirectory)/terraform/tfplan.txt'
+    artifactName: tfplan
 
   env:
     TF_VAR_sql_admin_password: $(sql_admin_password)
