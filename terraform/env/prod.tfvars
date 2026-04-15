@@ -1,5 +1,5 @@
 resource_group_name  = "rg-prod-001"
-location             = "West US 2"
+location             = "Central US"
 
 vm_name              = "vm-prod-app"
 admin_username       = "azureuser"
