@@ -17,12 +17,11 @@ stages:
       runOnce:
         deploy:
           steps:
-          - checkout: self
           - task: AzureCLI@2
             displayName: Terraform Apply
             inputs:
               azureSubscription: terraform-connection
-              scriptType: ps
+              scriptType: pscore
               scriptLocation: inlineScript
               workingDirectory: $(System.DefaultWorkingDirectory)/terraform
               inlineScript: |
@@ -31,4 +30,4 @@ stages:
                 terraform apply -var-file="env/prod.tfvars" -auto-approve
             env:
               TF_VAR_sql_admin_password: $(sql_admin_password)
-              TF_VAR_ssh_public_key: $(ssh_public_key
+              TF_VAR_ssh_public_key: $(ssh_public_key)
