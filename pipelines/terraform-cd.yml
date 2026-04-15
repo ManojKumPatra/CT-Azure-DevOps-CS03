@@ -21,7 +21,7 @@ stages:
             displayName: Terraform Apply
             inputs:
               azureSubscription: terraform-connection
-              scriptType: pscore
+              scriptType: ps
               scriptLocation: inlineScript
               workingDirectory: $(System.DefaultWorkingDirectory)/terraform
               inlineScript: |
