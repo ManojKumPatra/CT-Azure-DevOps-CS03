@@ -12,11 +12,25 @@ stages:
   displayName: Terraform Apply (Prod)
   jobs:
   - deployment: TerraformApply
-    environment: prod   # This enforces approval
+    environment: prod   # approval gate
     strategy:
       runOnce:
         deploy:
           steps:
+
+          # FIX 1: Clean checkout to avoid old code (VERY IMPORTANT)
+          - checkout: self
+            clean: true
+
+          # Optional but recommended debug step
+          - script: |
+              echo "Working directory:"
+              dir $(System.DefaultWorkingDirectory)
+              echo "Terraform folder:"
+              dir $(System.DefaultWorkingDirectory)\terraform
+            displayName: "Debug Workspace"
+
+          # Terraform Apply
           - task: AzureCLI@2
             displayName: Terraform Apply
             inputs:
@@ -26,8 +40,15 @@ stages:
               workingDirectory: $(System.DefaultWorkingDirectory)/terraform
               inlineScript: |
                 terraform version
+
+                # FIX 2: safer init (no cached backend issues)
                 terraform init -reconfigure
+
+                # (optional but recommended) validate before apply
+                terraform validate
+
                 terraform apply -var-file="env/prod.tfvars" -auto-approve
+
             env:
               TF_VAR_sql_admin_password: $(sql_admin_password)
               TF_VAR_ssh_public_key: $(ssh_public_key)
